@@ -11,6 +11,7 @@
     "better-scroll": "^1.15.2",
     "body-parser": "^1.19.0",
     "core-js": "^3.4.3",
+    "create-keyframe-animation": "^0.1.0",
     "fastclick": "^1.0.6",
     "jsonp": "^0.2.1",
     "vue": "^2.6.10",

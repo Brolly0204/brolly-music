@@ -1,7 +1,12 @@
 <template>
   <div class="song-list">
     <ul>
-      <li v-for="song in songs" :key="song.id" class="item">
+      <li
+        @click="selectItem(song, index)"
+        v-for="(song, index) in songs"
+        :key="song.id"
+        class="item"
+      >
         <div class="content">
           <h2 class="name">{{song.name}}</h2>
           <p class="desc">{{getDesc(song)}}</p>
@@ -16,13 +21,14 @@ export default {
   props: {
     songs: {
       type: Array,
-      default: () => ([])
+      default: () => []
     }
   },
-  data: () => ({
-
-  }),
+  data: () => ({}),
   methods: {
+    selectItem(song, index) {
+      this.$emit('select', song, index)
+    },
     getDesc(song) {
       return `${song.singer} · ${song.album}`
     }
@@ -30,25 +36,28 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-  @import '~assets/stylus/variable';
-  @import '~assets/stylus/mixin';
+@import '~assets/stylus/variable'
+@import '~assets/stylus/mixin'
 
-  .song-list
-    .item
-      display flex
-      align-items center
-      box-sizing border-box
-      height 64px
-      font-size $font-size-medium
-      .content
-        flex 1
-        line-height 20px
-        overflow hidden
-        .name
-          no-wrap()
-          color $color-text
-        .desc
-          no-wrap()
-          margin-top 4px
-          color $color-text-d
+.song-list
+  .item
+    display flex
+    align-items center
+    box-sizing border-box
+    height 64px
+    font-size $font-size-medium
+
+    .content
+      flex 1
+      line-height 20px
+      overflow hidden
+
+      .name
+        no-wrap()
+        color $color-text
+
+      .desc
+        no-wrap()
+        margin-top 4px
+        color $color-text-d
 </style>

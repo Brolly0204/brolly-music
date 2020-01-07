@@ -1,19 +1,40 @@
 <template>
   <div class="music-list">
-    <div class="back" @click="back">
+    <div
+      class="back"
+      @click="back"
+    >
       <i class="icon-back"></i>
     </div>
-    <h1 class="title" v-html="title"></h1>
-    <div class="bg-image" :style="bgStyle" ref="bgImage">
+    <h1
+      class="title"
+      v-html="title"
+    ></h1>
+    <div
+      class="bg-image"
+      :style="bgStyle"
+      ref="bgImage"
+    >
       <div class="play-wrapper">
-        <div ref="playBtn" class="play" v-show="songs.length > 0">
+        <div
+          ref="playBtn"
+          class="play"
+          v-show="songs.length > 0"
+          @click="random"
+        >
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
       </div>
-      <div class="filter" ref="filter"></div>
+      <div
+        class="filter"
+        ref="filter"
+      ></div>
     </div>
-    <div class="bg-layer" ref="layer"></div>
+    <div
+      class="bg-layer"
+      ref="layer"
+    ></div>
     <scroll
       ref="list"
       :data="songs"
@@ -23,9 +44,15 @@
       class="list"
     >
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list
+          @select="selectItem"
+          :songs="songs"
+        ></song-list>
       </div>
-      <div v-show="!songs.length" class="loading-container">
+      <div
+        v-show="!songs.length"
+        class="loading-container"
+      >
         <loading></loading>
       </div>
     </scroll>
@@ -36,13 +63,12 @@ import Scroll from '@/base/scroll/scroll'
 import SongList from '@/base/song-list/song-list'
 import Loading from '@/base/loading/loading'
 import { prefixStyle } from '@/common/dom'
+import { mapActions } from 'vuex'
 
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform')
 const backdrop = prefixStyle('backdrop-filter')
 
-console.log(transform)
-console.log(backdrop)
 export default {
   components: {
     Scroll,
@@ -56,7 +82,7 @@ export default {
     },
     songs: {
       type: Array,
-      default: () => ([])
+      default: () => []
     },
     title: {
       type: String
@@ -78,7 +104,8 @@ export default {
       let scale = 1
       let blur = 0
       const percent = Math.abs(newY / this.imageHeight)
-      if (newY > 0) { // 向下拉
+      if (newY > 0) {
+        // 向下拉
         scale = 1 + percent
         zIndex = 10
       } else {
@@ -86,7 +113,8 @@ export default {
       }
       this.$refs.filter.style[backdrop] = `blur(${blur}px)`
       this.$refs.filter.style['backdrop-filter'] = `blur(${blur}px)`
-      if (newY <= this.minTranslateY) { // 滚动到顶部时
+      if (newY <= this.minTranslateY) {
+        // 滚动到顶部时
         zIndex = 10
         this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
         this.$refs.bgImage.style.paddingTop = 0
@@ -110,100 +138,128 @@ export default {
     this.$refs.list.$el.style.top = `${this.imageHeight}px`
   },
   methods: {
+    random() {
+      this.randomPlay({
+        list: this.songs
+      })
+    },
+    selectItem(song, index) {
+      this.selectPlay({
+        list: this.songs,
+        index
+      })
+    },
     scroll(pos) {
       this.scrollY = pos.y
     },
     back() {
       this.$router.back()
-    }
+    },
+    ...mapActions([
+      'selectPlay',
+      'randomPlay'
+    ])
   }
 }
 </script>
 <style lang="stylus" scoped>
-  @import '~assets/stylus/variable';
-  @import '~assets/stylus/mixin';
+@import '~assets/stylus/variable'
+@import '~assets/stylus/mixin'
 
-  .music-list
-    position fixed
+.music-list
+  position fixed
+  top 0
+  left 0
+  bottom 0
+  right 0
+  background $color-background
+  z-index 100
+
+  .back
+    position absolute
     top 0
-    left 0
-    bottom 0
-    right 0
-    background $color-background
-    z-index 100
-    .back
+    left 6px
+    z-index 50
+
+    .icon-back
+      display block
+      padding 10px
+      font-size $font-size-large-x
+      color $color-theme
+
+  .title
+    position absolute
+    top 0
+    left 10%
+    width 88%
+    z-index 40
+    no-wrap()
+    text-align center
+    line-height 40px
+    font-size $font-size-large
+    color $color-text
+
+  .bg-image
+    position relative
+    width 100%
+    height 0
+    padding-top 70%
+    transform-origin top
+    background-size cover
+
+    .play-wrapper
       position absolute
-      top 0
-      left 6px
+      bottom 20px
+      width 100%
       z-index 50
-      .icon-back
-        display block
-        padding 10px
-        font-size $font-size-large-x
+
+      .play
+        width 135px
+        padding 7px 0
+        margin 0 auto
+        text-align center
+        border 1px solid $color-theme
         color $color-theme
-    .title
+        border-radius 100px
+        font-size 0
+
+        .icon-play
+          display inline-block
+          vertical-align middle
+          margin-right 6px
+          font-size $font-size-medium-x
+
+        .text
+          display inline-block
+          vertical-align middle
+          font-size $font-size-small
+
+    .filter
       position absolute
       top 0
-      left 10%
-      width 88%
-      z-index 40
-      no-wrap()
-      text-align center
-      line-height 40px
-      font-size $font-size-large
-      color $color-text
-    .bg-image
-      position relative
+      left 0
       width 100%
-      height 0
-      padding-top 70%
-      transform-origin top
-      background-size cover
-      .play-wrapper
-        position absolute
-        bottom 20px
-        width 100%
-        z-index 50
-        .play
-          width 135px
-          padding 7px 0
-          margin 0 auto
-          text-align center
-          border 1px solid $color-theme
-          color $color-theme
-          border-radius 100px
-          font-size 0
-          .icon-play
-            display inline-block
-            vertical-align middle
-            margin-right 6px
-            font-size $font-size-medium-x
-          .text
-            display inline-block
-            vertical-align middle
-            font-size $font-size-small
-      .filter
-        position absolute
-        top 0
-        left 0
-        width 100%
-        height 100%
-        background rgba(7, 17, 27, .4)
-    .bg-layer
-      position relative
       height 100%
-      background-color $color-background
-    .list
+      background rgba(7, 17, 27, 0.4)
+
+  .bg-layer
+    position relative
+    height 100%
+    background-color $color-background
+
+  .list
+    position absolute
+    top 0
+    bottom 0
+    width 100%
+    background $color-background
+
+    .song-list-wrapper
+      padding 20px 30px
+
+    .loading-container
       position absolute
-      top 0
-      bottom 0
       width 100%
-      background $color-background
-      .song-list-wrapper
-        padding 20px 30px
-      .loading-container
-        position absolute
-        width 100%
-        top 45%
-        transform tanslateY(-50%)
+      top 45%
+      transform tanslateY(-50%)
 </style>
